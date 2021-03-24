@@ -14,7 +14,7 @@ const pixabayApiService = new PixabayApiService();
 refs.searchForm.addEventListener('submit', onSearch);
 refs.gallery.addEventListener('click', onOpenModal);
 
-function onSearch(event) {
+async function onSearch(event) {
   event.preventDefault();
   const form = event.currentTarget;
   pixabayApiService.query = form.elements.query.value;
@@ -34,10 +34,10 @@ function onSearch(event) {
   }
 
   pixabayApiService.resetPage();
-  pixabayApiService.fetchArticles().then(data => {
-    clearGallery();
-    appendGalleryMarkup(data);
-  });
+  const data = await pixabayApiService.fetchArticles();
+  clearGallery();
+  appendGalleryMarkup(data);
+
 }
 
 function clearGallery() {
@@ -45,7 +45,7 @@ function clearGallery() {
 }
 
 function appendGalleryMarkup(data) {
-  refs.gallery.insertAdjacentHTML('beforeend', galleryCardTpl(data));
+   refs.gallery.insertAdjacentHTML('beforeend', galleryCardTpl(data));
 }
 
 const options = {
@@ -53,14 +53,14 @@ const options = {
   threshold: 0.05,
 };
 
-const onEntry = entries => {
-  entries.forEach(entry => {
+const onEntry =  function (entries) {
+   entries.forEach(async(entry) => {
     if (!entry.isIntersecting || pixabayApiService.query === '') {
       return;
     }
-    pixabayApiService.fetchArticles().then(data => {
+   const data = await pixabayApiService.fetchArticles()
+      console.log(data);
       appendGalleryMarkup(data);
-    });
   });
 };
 
